@@ -1,0 +1,29 @@
+rules_version = '2';
+service firebase.storage {
+  match /b/{bucket}/o {
+    
+    // ======================================
+    // PROFILE PHOTOS
+    // ======================================
+    // Users can only upload/read their own profile photos
+    // Path: profilePhotos/{userId}/{filename}
+    match /profilePhotos/{userId}/{allPaths=**} {
+      // Allow read for anyone (public profile photos)
+      allow read: if true;
+      
+      // Only allow write if authenticated and user owns the path
+      allow write: if request.auth != null 
+                   && request.auth.uid == userId
+                   && request.resource.size < 5 * 1024 * 1024  // Max 5MB
+                   && request.resource.contentType.matches('image/.*');  // Only images
+    }
+    
+    // ======================================
+    // DEFAULT DENY
+    // ======================================
+    // Deny all other access by default
+    match /{allPaths=**} {
+      allow read, write: if false;
+    }
+  }
+}
