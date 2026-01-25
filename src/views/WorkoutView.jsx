@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Trash2, Edit2, Check, X, Minus, Plus } from 'lucide-react';
+import { Trash2, Edit2, Check, X, Minus, Plus, Coffee, Sparkles, Moon } from 'lucide-react';
 import CinematicCard from '../components/ui/CinematicCard';
 import ConfirmModal from '../components/ui/ConfirmModal';
 
@@ -144,8 +144,43 @@ const WorkoutView = ({
           </div>
         </div>
 
-        {/* Exercises - Desktop Grid */}
-        <div className="lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-6">
+        {/* Rest Day Special View */}
+        {currentDay.isRestDay ? (
+          <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-6">
+            {/* Rest Day Icon */}
+            <div className="w-32 h-32 bg-gradient-to-br from-purple-500/20 to-indigo-500/20 rounded-full flex items-center justify-center mb-8 border border-purple-500/30 shadow-[0_0_60px_rgba(168,85,247,0.2)]">
+              <Moon size={56} className="text-purple-400" />
+            </div>
+            
+            {/* Rest Day Message */}
+            <h2 className="text-3xl lg:text-4xl font-black text-white mb-4 font-display">
+              {lang === 'tr' ? 'Bugün Dinlenme Günü!' : 'Rest Day!'}
+            </h2>
+            <p className="text-gray-400 text-lg mb-6 max-w-md">
+              {lang === 'tr' 
+                ? 'Antrenman yok. Vücudun toparlanıyor, keyfine bak!' 
+                : 'No workout today. Your body is recovering, enjoy your rest!'}
+            </p>
+            
+            {/* Motivational Tips */}
+            <div className="space-y-3 w-full max-w-sm">
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <Coffee className="text-amber-400 shrink-0" size={24} />
+                <span className="text-sm text-gray-300 text-left">
+                  {lang === 'tr' ? 'Bol su iç, proteinini al' : 'Stay hydrated, get your protein'}
+                </span>
+              </div>
+              <div className="flex items-center gap-3 p-4 bg-white/5 rounded-2xl border border-white/10">
+                <Sparkles className="text-emerald-400 shrink-0" size={24} />
+                <span className="text-sm text-gray-300 text-left">
+                  {lang === 'tr' ? 'İyi uyu, kasların büyüyor' : 'Sleep well, muscles are growing'}
+                </span>
+              </div>
+            </div>
+          </div>
+        ) : (
+          /* Exercises - Desktop Grid */
+          <div className="lg:grid lg:grid-cols-2 xl:grid-cols-3 lg:gap-6">
           {currentDay.exercises?.map((ex) => (
             <div key={ex.id} className="relative">
               {/* Premium Edit Controls */}
@@ -211,6 +246,7 @@ const WorkoutView = ({
             </div>
           ))}
         </div>
+        )}
       </main>
 
       {/* Day Selector - BOLD & PREMIUM */}
@@ -242,8 +278,8 @@ const WorkoutView = ({
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col items-center">
-                  <span className={`text-[10px] font-bold tracking-widest uppercase mb-1 transition-colors ${
-                    isActive ? 'text-black/60' : 'text-gray-500 group-hover:text-gray-300'
+                <span className={`text-[11px] font-black font-display tracking-widest uppercase mb-1 transition-colors ${
+                    isActive ? 'text-black/70' : 'text-gray-400 group-hover:text-gray-200'
                   }`}>
                     {dayText}
                   </span>

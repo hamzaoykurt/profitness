@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
-import { Wand2, Calendar, Dumbbell, Plus, Minus, Trash2, Save, BrainCircuit, Loader2, ArrowLeft, ChevronRight, Crown } from 'lucide-react';
+import { Wand2, Calendar, Dumbbell, Plus, Minus, Trash2, Save, BrainCircuit, Loader2, ArrowLeft, ChevronRight, Crown, Search } from 'lucide-react';
 import GlassPanel from '../components/ui/GlassPanel';
 import CreditModal from '../components/ui/CreditModal';
+import ExercisePicker from '../components/ui/ExercisePicker';
 import { askCoach } from '../services/geminiService';
 import { checkCredits, useCredit } from '../services/userService';
+import { getExerciseImage } from '../services/mockData';
 
 const ProgramBuilderView = ({ onSave, t, lang, mode: initialMode, onBack, userId, profile, onNavigateToPremium }) => {
   const [mode, setMode] = useState(initialMode || 'manual');
@@ -24,7 +26,19 @@ const ProgramBuilderView = ({ onSave, t, lang, mode: initialMode, onBack, userId
   const [dayLabel, setDayLabel] = useState("");
   const [dayTitle, setDayTitle] = useState("");
   const [exercises, setExercises] = useState([]);
-  const [tempEx, setTempEx] = useState({ name: "", sets: "", reps: "" });
+  const [tempEx, setTempEx] = useState({ name: "", sets: "3", reps: "10" });
+  const [showExercisePicker, setShowExercisePicker] = useState(false);
+
+  // Handle exercise selection from visual picker - populate tempEx for customization
+  const handleSelectFromPicker = (exercise) => {
+    setTempEx({
+      name: exercise.name,
+      sets: exercise.sets.toString(),
+      reps: exercise.reps.toString(),
+      note: exercise.note || (lang === 'tr' ? "Formu koru." : "Maintain form."),
+      muscles: exercise.muscles
+    });
+  };
 
   const handleAddExercise = () => {
     if (tempEx.name && tempEx.sets && tempEx.reps) {
@@ -33,10 +47,11 @@ const ProgramBuilderView = ({ onSave, t, lang, mode: initialMode, onBack, userId
         name: tempEx.name,
         sets: parseInt(tempEx.sets) || 3,
         reps: parseInt(tempEx.reps) || 10,
-        note: lang === 'tr' ? "Formu koru." : "Maintain form.",
+        note: tempEx.note || (lang === 'tr' ? "Formu koru." : "Maintain form."),
+        muscles: tempEx.muscles || "",
         gym: "-"
       }]);
-      setTempEx({ name: "", sets: "", reps: "" });
+      setTempEx({ name: "", sets: "3", reps: "10" });
     }
   };
 
@@ -115,14 +130,32 @@ const ProgramBuilderView = ({ onSave, t, lang, mode: initialMode, onBack, userId
     const prompt = lang === 'tr'
       ? `Fitness hedefi: "${aiPrompt}"
 
-3 günlük antrenman programı oluştur. JSON formatında yanıt ver:
-[{"label":"1. GÜN","title":"Göğüs","exercises":[{"name":"Bench Press","sets":4,"reps":10}]}]
+Kullanıcının ihtiyacına göre 1-7 gün arası antrenman programı oluştur. Gün etiketleri için kısaltma kullan (Pzt, Sal, Çar, Per, Cum, Cmt, Paz).
+
+ÖNEMLİ KURALLAR:
+1. Her hareket için "note" alanında O HAREKETE ÖZEL pro ipuçları yaz (gerçek teknik bilgi, form tavsiyeleri veya dikkat edilmesi gereken noktalar)
+2. Eğer program Pazar günü içeriyorsa, Pazar dinlenme günü olsun ve "isRestDay": true ekle, exercises boş array olsun
+
+JSON formatında yanıt ver:
+[
+  {"label":"Pzt","title":"Göğüs","exercises":[{"name":"Bench Press","sets":4,"reps":10,"note":"Dirsekleri 45 derece açıda tut, omuzları geri çek."}]},
+  {"label":"Paz","title":"Dinlenme","isRestDay":true,"exercises":[]}
+]
 
 Sadece JSON array döndür, başka metin yazma.`
       : `Fitness goal: "${aiPrompt}"
 
-Create a 3-day workout program. Reply in JSON format:
-[{"label":"DAY 1","title":"Chest","exercises":[{"name":"Bench Press","sets":4,"reps":10}]}]
+Create a 1-7 day workout program based on user needs. Use abbreviated weekday names (Mon, Tue, Wed, Thu, Fri, Sat, Sun).
+
+IMPORTANT RULES:
+1. For each exercise, write EXERCISE-SPECIFIC pro tips in the "note" field (real technical advice, form tips, or points to watch)
+2. If the program includes Sunday, make it a rest day with "isRestDay": true and empty exercises array
+
+Reply in JSON format:
+[
+  {"label":"Mon","title":"Chest","exercises":[{"name":"Bench Press","sets":4,"reps":10,"note":"Keep elbows at 45 degrees, retract shoulders."}]},
+  {"label":"Sun","title":"Rest","isRestDay":true,"exercises":[]}
+]
 
 Only return JSON array, no other text.`;
 
@@ -159,12 +192,13 @@ Only return JSON array, no other text.`;
             const processedDays = programData.map((day, dayIndex) => ({
               ...day,
               id: Date.now() + dayIndex,
+              isRestDay: day.isRestDay || false,
               exercises: (day.exercises || []).map((ex, exIndex) => ({
                 ...ex,
                 id: `e${Date.now()}_${dayIndex}_${exIndex}`,
                 sets: parseInt(ex.sets) || 3,
                 reps: parseInt(ex.reps) || 10,
-                note: lang === 'tr' ? "AI tarafından oluşturuldu." : "Created by AI.",
+                note: ex.note || (lang === 'tr' ? 'Formu koru.' : 'Maintain form.'),
                 gym: "-"
               }))
             }));
@@ -248,7 +282,7 @@ Only return JSON array, no other text.`;
             <input 
               value={dayLabel} 
               onChange={e => setDayLabel(e.target.value)} 
-              placeholder={t.day_name || (lang === 'tr' ? 'Gün Etiketi (örn: 1. GÜN)' : 'Day Label (e.g., DAY 1)')}
+              placeholder={t.day_name || (lang === 'tr' ? 'Gün Adı (örn: Pzt, Sal, Çar)' : 'Day Name (e.g., Mon, Tue, Wed)')}
               className="w-full p-4 bg-white/5 rounded-2xl border border-white/10 text-white focus:outline-none focus:border-emerald-500/50 transition-colors placeholder-gray-600" 
             />
             <input 
@@ -267,91 +301,143 @@ Only return JSON array, no other text.`;
                 {lang === 'tr' ? 'HAREKET EKLE' : 'ADD EXERCISE'}
               </span>
             </div>
-            <input 
-              value={tempEx.name} 
-              onChange={e => setTempEx({...tempEx, name: e.target.value})} 
-              placeholder={lang === 'tr' ? 'Hareket Adı' : 'Exercise Name'}
-              className="w-full p-4 bg-white/5 rounded-2xl border border-white/10 text-white focus:outline-none focus:border-emerald-500/50 placeholder-gray-600" 
-            />
             
-            {/* Premium Stepper Row */}
-            <div className="flex items-center gap-4 justify-center py-2">
-              {/* Set Stepper */}
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">SET</span>
-                <div className="flex items-center gap-1 bg-white/5 rounded-2xl p-1.5 border border-white/10">
-                  <button
-                    type="button"
-                    onClick={() => setTempEx({...tempEx, sets: Math.max(1, (parseInt(tempEx.sets) || 3) - 1).toString()})}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all active:scale-95"
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <span className="w-12 text-2xl font-black text-white text-center font-display">
-                    {tempEx.sets || '3'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setTempEx({...tempEx, sets: Math.min(20, (parseInt(tempEx.sets) || 3) + 1).toString()})}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-              </div>
-              
-              <span className="text-gray-500 text-2xl font-bold mt-6">×</span>
-              
-              {/* Reps Stepper */}
-              <div className="flex flex-col items-center gap-2">
-                <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
-                  {lang === 'tr' ? 'TEKRAR' : 'REPS'}
-                </span>
-                <div className="flex items-center gap-1 bg-white/5 rounded-2xl p-1.5 border border-white/10">
-                  <button
-                    type="button"
-                    onClick={() => setTempEx({...tempEx, reps: Math.max(1, (parseInt(tempEx.reps) || 10) - 1).toString()})}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all active:scale-95"
-                  >
-                    <Minus size={16} />
-                  </button>
-                  <span className="w-12 text-2xl font-black text-white text-center font-display">
-                    {tempEx.reps || '10'}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setTempEx({...tempEx, reps: Math.min(100, (parseInt(tempEx.reps) || 10) + 1).toString()})}
-                    className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95"
-                  >
-                    <Plus size={16} />
-                  </button>
-                </div>
-              </div>
-            </div>
-            
+            {/* Visual Exercise Picker Button */}
             <button 
-              onClick={handleAddExercise} 
-              className="w-full py-4 bg-white/10 rounded-2xl text-xs font-bold uppercase hover:bg-white/20 transition-colors flex items-center justify-center gap-2 border border-white/5"
+              onClick={() => setShowExercisePicker(true)}
+              className="w-full p-4 bg-gradient-to-r from-emerald-500/20 to-teal-500/20 hover:from-emerald-500/30 hover:to-teal-500/30 rounded-2xl border border-emerald-500/30 text-white font-bold transition-all flex items-center justify-center gap-3 group"
             >
-              <Plus size={16} /> {t.add_exercise || (lang === 'tr' ? 'Hareket Ekle' : 'Add Exercise')}
+              <Search size={20} className="text-emerald-400 group-hover:scale-110 transition-transform" />
+              <span>{lang === 'tr' ? 'Hareket Kütüphanesinden Seç' : 'Browse Exercise Library'}</span>
             </button>
+            
+            {/* Selected Exercise Display */}
+            {tempEx.name && (
+              <div className="p-4 bg-white/5 rounded-2xl border border-emerald-500/30">
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-800 shrink-0">
+                    <img 
+                      src={getExerciseImage(tempEx.name)} 
+                      alt={tempEx.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                  <div className="flex-1">
+                    <div className="font-bold text-white">{tempEx.name}</div>
+                    {tempEx.muscles && (
+                      <div className="text-[10px] text-emerald-400">{tempEx.muscles}</div>
+                    )}
+                  </div>
+                  <button 
+                    onClick={() => setTempEx({ name: "", sets: "3", reps: "10" })}
+                    className="p-2 text-gray-500 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+                
+                {/* Set/Rep Steppers */}
+                <div className="flex items-center gap-4 justify-center py-2">
+                  {/* Set Stepper */}
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">SET</span>
+                    <div className="flex items-center gap-1 bg-white/5 rounded-2xl p-1.5 border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => setTempEx({...tempEx, sets: Math.max(1, (parseInt(tempEx.sets) || 3) - 1).toString()})}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-12 text-2xl font-black text-white text-center font-display">
+                        {tempEx.sets || '3'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setTempEx({...tempEx, sets: Math.min(20, (parseInt(tempEx.sets) || 3) + 1).toString()})}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <span className="text-gray-500 text-2xl font-bold mt-6">×</span>
+                  
+                  {/* Reps Stepper */}
+                  <div className="flex flex-col items-center gap-2">
+                    <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">
+                      {lang === 'tr' ? 'TEKRAR' : 'REPS'}
+                    </span>
+                    <div className="flex items-center gap-1 bg-white/5 rounded-2xl p-1.5 border border-white/10">
+                      <button
+                        type="button"
+                        onClick={() => setTempEx({...tempEx, reps: Math.max(1, (parseInt(tempEx.reps) || 10) - 1).toString()})}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white transition-all active:scale-95"
+                      >
+                        <Minus size={16} />
+                      </button>
+                      <span className="w-12 text-2xl font-black text-white text-center font-display">
+                        {tempEx.reps || '10'}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => setTempEx({...tempEx, reps: Math.min(100, (parseInt(tempEx.reps) || 10) + 1).toString()})}
+                        className="w-10 h-10 flex items-center justify-center rounded-xl bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 transition-all active:scale-95"
+                      >
+                        <Plus size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Add Button */}
+                <button 
+                  onClick={handleAddExercise} 
+                  className="w-full py-4 bg-emerald-500 text-black font-bold rounded-xl text-sm uppercase tracking-widest hover:bg-emerald-400 transition-colors flex items-center justify-center gap-2 mt-3"
+                >
+                  <Plus size={16} /> {lang === 'tr' ? 'Hareketi Ekle' : 'Add Exercise'}
+                </button>
+              </div>
+            )}
+            
+            {!tempEx.name && (
+              <p className="text-[10px] text-gray-500 text-center">
+                {lang === 'tr' 
+                  ? '40+ hazır hareket • Kas gruplarına göre filtreleme • Görsel seçim' 
+                  : '40+ exercises • Filter by muscle group • Visual selection'}
+              </p>
+            )}
           </GlassPanel>
 
           {/* Current Day Exercises */}
           {exercises.length > 0 && (
             <div className="space-y-3">
               <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest px-2">
-                {lang === 'tr' ? 'Bu Gündeki Hareketler' : 'Exercises in This Day'}
+                {lang === 'tr' ? 'Bu Gündeki Hareketler' : 'Exercises in This Day'} ({exercises.length})
               </h3>
               {exercises.map((ex, i) => (
-                <div key={ex.id || i} className="flex justify-between items-center p-5 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
-                  <div>
-                    <div className="font-bold text-white text-lg font-display">{ex.name}</div>
-                    <div className="text-xs text-gray-400 font-mono mt-1">{ex.sets} SET x {ex.reps} {lang === 'tr' ? 'TEKRAR' : 'REPS'}</div>
+                <div key={ex.id || i} className="flex gap-4 items-center p-4 bg-white/5 rounded-2xl border border-white/10 backdrop-blur-sm">
+                  {/* Exercise Image Thumbnail */}
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-800 shrink-0">
+                    <img 
+                      src={getExerciseImage(ex.name)} 
+                      alt={ex.name}
+                      className="w-full h-full object-cover"
+                      onError={(e) => { e.target.style.display = 'none'; }}
+                    />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="font-bold text-white text-base font-display truncate">{ex.name}</div>
+                    {ex.muscles && (
+                      <div className="text-[10px] text-emerald-400 mt-0.5 truncate">{ex.muscles}</div>
+                    )}
+                    <div className="text-xs text-gray-400 font-mono mt-1">{ex.sets} SET × {ex.reps} {lang === 'tr' ? 'TEKRAR' : 'REPS'}</div>
                   </div>
                   <button 
                     onClick={() => setExercises(exercises.filter((_, idx) => idx !== i))} 
-                    className="p-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-colors"
+                    className="p-3 text-red-400 hover:bg-red-400/10 rounded-xl transition-colors shrink-0"
                   >
                     <Trash2 size={18} />
                   </button>
@@ -451,6 +537,14 @@ Only return JSON array, no other text.`;
           )}
         </GlassPanel>
       )}
+      
+      {/* Exercise Picker Modal */}
+      <ExercisePicker 
+        isOpen={showExercisePicker}
+        onClose={() => setShowExercisePicker(false)}
+        onSelect={handleSelectFromPicker}
+        lang={lang}
+      />
       
       {/* Credit Modal */}
       <CreditModal 
