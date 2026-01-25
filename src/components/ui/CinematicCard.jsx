@@ -1,6 +1,6 @@
 import React from 'react';
-import { Check, ArrowRight, Zap, Dumbbell, X } from 'lucide-react';
-import { getExerciseImage } from '../../services/mockData';
+import { Check, ArrowRight, Zap, Dumbbell, X, ExternalLink } from 'lucide-react';
+import { getExerciseImage, getMuscleWikiUrl } from '../../services/mockData';
 
 const CinematicCard = ({ exercise, isExpanded, onToggle, onComplete, isCompleted, t }) => {
   return (
@@ -65,10 +65,22 @@ const CinematicCard = ({ exercise, isExpanded, onToggle, onComplete, isCompleted
               <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0 text-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)] border border-amber-500/20">
                 <Zap size={20} fill="currentColor" />
               </div>
-              <div>
+              <div className="flex-1">
                 <h4 className="text-[9px] font-bold text-amber-400 uppercase tracking-widest mb-1">{t.pro_tip}</h4>
                 <p className="text-xs text-gray-200 leading-relaxed font-medium">{exercise.note}</p>
               </div>
+              {/* Tutorial Link Button */}
+              <a 
+                href={getMuscleWikiUrl(exercise.name)} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+                className="flex items-center gap-1.5 px-3 py-2 bg-white/10 hover:bg-white/20 rounded-xl text-[10px] font-bold text-gray-300 hover:text-white transition-all shrink-0 border border-white/10 hover:border-white/20"
+                title={t.how_to || "Nasıl Yapılır?"}
+              >
+                <ExternalLink size={12} />
+                <span className="hidden sm:inline">{t.how_to || "Nasıl?"}</span>
+              </a>
            </div>
            
            {exercise.gym !== "-" && (

@@ -85,37 +85,151 @@ export const TRANSLATIONS = {
       finish_set: "FINISH SET"
     }
   };
-  
   // --- EXERCISE IMAGE LIBRARY ---
-  // Maps exercise names to high-quality Unsplash images
+  // Returns local path for exercise images
+  // Images should be placed in public/exercises/ directory
   export const getExerciseImage = (name) => {
     const n = (name || '').toLowerCase();
-    const library = {
-      "barfiks": "https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?q=80&w=1200&auto=format&fit=crop", 
-      "pull-up": "https://images.unsplash.com/photo-1598971639058-211a74a96ddc?q=80&w=1200&auto=format&fit=crop",
-      "press": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop", 
-      "bench": "https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?q=80&w=1200&auto=format&fit=crop",
-      "row": "https://images.unsplash.com/photo-1598971639058-211a74a96ddc?q=80&w=1200&auto=format&fit=crop", 
-      "push-up": "https://images.unsplash.com/photo-1598971457999-e56ddb68b030?q=80&w=1200&auto=format&fit=crop",
-      "şınav": "https://images.unsplash.com/photo-1598971457999-e56ddb68b030?q=80&w=1200&auto=format&fit=crop",
-      "squat": "https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=1200&auto=format&fit=crop",
-      "deadlift": "https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=1200&auto=format&fit=crop",
-      "lunge": "https://images.unsplash.com/photo-1434608519344-49d77a699ded?q=80&w=1200&auto=format&fit=crop",
-      "plank": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop",
-      "run": "https://images.unsplash.com/photo-1552674605-5d28c4e1902c?q=80&w=1200&auto=format&fit=crop",
-      "koşu": "https://images.unsplash.com/photo-1552674605-5d28c4e1902c?q=80&w=1200&auto=format&fit=crop",
-      "swim": "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?q=80&w=1200&auto=format&fit=crop",
-      "yüzme": "https://images.unsplash.com/photo-1601422407692-ec4eeec1d9b3?q=80&w=1200&auto=format&fit=crop",
-      "yoga": "https://images.unsplash.com/photo-1544367563-121955375564?q=80&w=1200&auto=format&fit=crop",
-      "curl": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1200&auto=format&fit=crop",
-      "tricep": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1200&auto=format&fit=crop",
-      "shoulder": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1200&auto=format&fit=crop",
-      "dumbbell": "https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=1200&auto=format&fit=crop",
-      "kb": "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?q=80&w=1200&auto=format&fit=crop",
-      "kettlebell": "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?q=80&w=1200&auto=format&fit=crop",
-      "thruster": "https://images.unsplash.com/photo-1517963879433-6ad2b056d712?q=80&w=1200&auto=format&fit=crop",
-      "default": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=1200&auto=format&fit=crop"
+    
+    // Map varied user inputs to canonical filenames
+    // keys: lowercase search terms
+    // values: filename in /exercises/ folder (without extension if using helper, but here we specify full path)
+    const imageMap = {
+      // Chest
+      "bench": "/exercises/bench-press.png",
+      "press": "/exercises/bench-press.png", 
+      "push-up": "/exercises/push-up.png",
+      "pushup": "/exercises/push-up.png",
+      "şınav": "/exercises/push-up.png",
+      "fly": "/exercises/dumbbell-fly.png",
+      "incline": "/exercises/incline-press.png",
+      
+      // Back
+      "pull-up": "/exercises/pull-up.png",
+      "pullup": "/exercises/pull-up.png",
+      "barfiks": "/exercises/pull-up.png",
+      "chin-up": "/exercises/pull-up.png",
+      "lat": "/exercises/lat-pulldown.png",
+      "row": "/exercises/barbell-row.png",
+      "kürek": "/exercises/barbell-row.png",
+      "deadlift": "/exercises/deadlift.png",
+      
+      // Shoulders
+      "shoulder": "/exercises/shoulder-press.png",
+      "overhead": "/exercises/shoulder-press.png",
+      "military": "/exercises/shoulder-press.png",
+      "lateral": "/exercises/lateral-raise.png",
+      "front": "/exercises/front-raise.png",
+      "face": "/exercises/face-pull.png",
+      
+      // Arms
+      "bicep": "/exercises/bicep-curl.png",
+      "curl": "/exercises/bicep-curl.png",
+      "hammer": "/exercises/hammer-curl.png",
+      "dip": "/exercises/tricep-dip.png",
+      "tricep": "/exercises/tricep-pushdown.png",
+      "skull": "/exercises/skull-crusher.png",
+      
+      // Legs
+      "squat": "/exercises/squat.png",
+      "leg press": "/exercises/leg-press.png",
+      "lunge": "/exercises/lunge.png",
+      "leg curl": "/exercises/leg-curl.png",
+      "extension": "/exercises/leg-extension.png",
+      "calf": "/exercises/calf-raise.png",
+      "hip": "/exercises/hip-thrust.png",
+      "romanian": "/exercises/rdl.png",
+      
+      // Core
+      "plank": "/exercises/plank.png",
+      "crunch": "/exercises/crunch.png",
+      "sit-up": "/exercises/sit-up.png",
+      "leg raise": "/exercises/leg-raise.png",
+      "russian": "/exercises/russian-twist.png",
+      "mountain": "/exercises/mountain-climber.png",
+      
+      // Cardio
+      "run": "/exercises/run.png",
+      "koşu": "/exercises/run.png",
+      "burpee": "/exercises/burpee.png",
+      "jump": "/exercises/jumping-jack.png",
     };
-    const key = Object.keys(library).find(k => n.includes(k));
-    return library[key] || library["default"];
+    
+    // Find matching image
+    const key = Object.keys(imageMap).find(k => n.includes(k));
+    
+    // Return mapped image or a default placeholder
+    return imageMap[key] || "/exercises/default.png";
+  };
+
+  // --- MUSCLEWIKI TUTORIAL LINKS ---
+  // Maps exercise names to MuscleWiki URLs for detailed form tutorials
+  export const getMuscleWikiUrl = (name) => {
+    const n = (name || '').toLowerCase();
+    
+    const muscleWikiLinks = {
+      // Chest
+      "bench press": "https://musclewiki.com/barbell/male/chest/barbell-bench-press",
+      "chest press": "https://musclewiki.com/machine/male/chest/machine-chest-press",
+      "push-up": "https://musclewiki.com/bodyweight/male/chest/push-up",
+      "pushup": "https://musclewiki.com/bodyweight/male/chest/push-up",
+      "şınav": "https://musclewiki.com/bodyweight/male/chest/push-up",
+      "dumbbell fly": "https://musclewiki.com/dumbbells/male/chest/dumbbell-fly",
+      "incline press": "https://musclewiki.com/dumbbells/male/chest/dumbbell-incline-press",
+      
+      // Back
+      "pull-up": "https://musclewiki.com/bodyweight/male/lats/pull-up",
+      "pullup": "https://musclewiki.com/bodyweight/male/lats/pull-up",
+      "barfiks": "https://musclewiki.com/bodyweight/male/lats/pull-up",
+      "lat pulldown": "https://musclewiki.com/cables/male/lats/lat-pulldown",
+      "row": "https://musclewiki.com/barbell/male/lats/barbell-row",
+      "bent over row": "https://musclewiki.com/barbell/male/lats/barbell-row",
+      "kürek": "https://musclewiki.com/barbell/male/lats/barbell-row",
+      "seated row": "https://musclewiki.com/cables/male/lats/seated-cable-row",
+      "deadlift": "https://musclewiki.com/barbell/male/hamstrings/barbell-deadlift",
+      
+      // Shoulders
+      "shoulder press": "https://musclewiki.com/dumbbells/male/shoulders/dumbbell-shoulder-press",
+      "overhead press": "https://musclewiki.com/barbell/male/shoulders/barbell-overhead-press",
+      "military press": "https://musclewiki.com/barbell/male/shoulders/barbell-overhead-press",
+      "lateral raise": "https://musclewiki.com/dumbbells/male/shoulders/dumbbell-lateral-raise",
+      "front raise": "https://musclewiki.com/dumbbells/male/shoulders/dumbbell-front-raise",
+      
+      // Arms
+      "bicep curl": "https://musclewiki.com/dumbbells/male/biceps/dumbbell-curl",
+      "curl": "https://musclewiki.com/dumbbells/male/biceps/dumbbell-curl",
+      "hammer curl": "https://musclewiki.com/dumbbells/male/biceps/dumbbell-hammer-curl",
+      "tricep dip": "https://musclewiki.com/bodyweight/male/triceps/tricep-dip",
+      "dip": "https://musclewiki.com/bodyweight/male/triceps/tricep-dip",
+      "tricep extension": "https://musclewiki.com/cables/male/triceps/cable-push-down",
+      "skull crusher": "https://musclewiki.com/barbell/male/triceps/barbell-skull-crusher",
+      
+      // Legs
+      "squat": "https://musclewiki.com/barbell/male/glutes/barbell-squat",
+      "leg press": "https://musclewiki.com/machine/male/quads/leg-press",
+      "lunge": "https://musclewiki.com/bodyweight/male/glutes/bodyweight-lunge",
+      "leg curl": "https://musclewiki.com/machine/male/hamstrings/leg-curl",
+      "leg extension": "https://musclewiki.com/machine/male/quads/leg-extension",
+      "calf raise": "https://musclewiki.com/machine/male/calves/calf-raise",
+      
+      // Core
+      "plank": "https://musclewiki.com/bodyweight/male/abdominals/plank",
+      "crunch": "https://musclewiki.com/bodyweight/male/abdominals/crunch",
+      "sit-up": "https://musclewiki.com/bodyweight/male/abdominals/sit-up",
+      "leg raise": "https://musclewiki.com/bodyweight/male/abdominals/leg-raise",
+      
+      // Cardio
+      "burpee": "https://musclewiki.com/bodyweight/male/cardio/burpee",
+    };
+    
+    // Find matching link
+    const key = Object.keys(muscleWikiLinks).find(k => n.includes(k));
+    
+    // Fallback to MuscleWiki search
+    if (!key) {
+      const searchTerm = encodeURIComponent(name);
+      return `https://musclewiki.com/directory?q=${searchTerm}`;
+    }
+    
+    return muscleWikiLinks[key];
   };
