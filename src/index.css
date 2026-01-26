@@ -11,28 +11,34 @@
     font-size: 14px;
     line-height: 1.5;
   }
-  
-  h1 { @apply text-2xl lg:text-3xl; }
-  h2 { @apply text-xl lg:text-2xl; }
-  h3 { @apply text-lg lg:text-xl; }
+
+  h1 {
+    @apply text-2xl lg:text-3xl;
+  }
+  h2 {
+    @apply text-xl lg:text-2xl;
+  }
+  h3 {
+    @apply text-lg lg:text-xl;
+  }
 }
 
 @layer components {
   /* ============================== */
   /* GLASS EFFECTS (REAL BLUR!)     */
   /* ============================== */
-  
+
   /* Premium Glass - Main panels with STRONG blur */
   .liquid-glass {
     background: rgba(255, 255, 255, 0.05);
     backdrop-filter: blur(40px) saturate(180%);
     -webkit-backdrop-filter: blur(40px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 
+    box-shadow:
       0 8px 32px rgba(0, 0, 0, 0.3),
       inset 0 0 0 1px rgba(255, 255, 255, 0.05);
   }
-  
+
   /* Subtle Glass - Cards & Badges - Very transparent */
   .liquid-glass-subtle {
     background: rgba(255, 255, 255, 0.03);
@@ -41,7 +47,7 @@
     border: 1px solid rgba(255, 255, 255, 0.08);
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
   }
-  
+
   /* Dark Glass - Menus - Transparent with blur */
   .liquid-glass-dark {
     background: rgba(0, 0, 0, 0.3);
@@ -57,7 +63,7 @@
     backdrop-filter: blur(32px) saturate(180%);
     -webkit-backdrop-filter: blur(32px) saturate(180%);
     border: 1px solid rgba(255, 255, 255, 0.08);
-    box-shadow: 
+    box-shadow:
       0 16px 48px rgba(0, 0, 0, 0.3),
       inset 0 0 0 1px rgba(255, 255, 255, 0.03);
   }
@@ -70,7 +76,7 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
   }
-  
+
   /* Glass Button - Transparent */
   .glass-button {
     background: rgba(255, 255, 255, 0.06);
@@ -83,7 +89,7 @@
     background: rgba(255, 255, 255, 0.12);
     border-color: rgba(255, 255, 255, 0.2);
   }
-  
+
   /* Glass Input */
   .glass-input {
     background: rgba(255, 255, 255, 0.04);
@@ -124,16 +130,21 @@
   /* ============================== */
   /* NEON & GLOW                    */
   /* ============================== */
-  .neon-text { text-shadow: 0 0 20px rgba(255, 255, 255, 0.25); }
-  .icon-glow { filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5)); }
-  .active-day-glow { 
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.35); 
+  .neon-text {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.25);
+  }
+  .icon-glow {
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.5));
+  }
+  .active-day-glow {
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.35);
     border: 1px solid rgba(255, 255, 255, 0.7);
   }
-  
+
   .emerald-glow {
-    box-shadow: 0 0 20px rgba(16, 185, 129, 0.3),
-                0 4px 12px rgba(16, 185, 129, 0.2);
+    box-shadow:
+      0 0 20px rgba(16, 185, 129, 0.3),
+      0 4px 12px rgba(16, 185, 129, 0.2);
   }
 
   /* ============================== */
@@ -146,7 +157,9 @@
     letter-spacing: 0.05em;
     transition: transform 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
-  .google-btn:active { transform: scale(0.97); }
+  .google-btn:active {
+    transform: scale(0.97);
+  }
 
   .demo-btn {
     background: rgba(255, 255, 255, 0.04);
@@ -158,12 +171,12 @@
     letter-spacing: 0.1em;
     transition: all 0.3s ease;
   }
-  .demo-btn:hover { 
-    background: rgba(255, 255, 255, 0.08); 
+  .demo-btn:hover {
+    background: rgba(255, 255, 255, 0.08);
     color: white;
     border-color: rgba(255, 255, 255, 0.15);
   }
-  
+
   /* Chat bubbles */
   .chat-bubble-user {
     background: linear-gradient(135deg, #059669 0%, #047857 100%);
@@ -179,10 +192,16 @@
   /* ============================== */
   /* TYPOGRAPHY                     */
   /* ============================== */
-  .text-micro { font-size: 9px; }
-  .text-mini { font-size: 10px; }
-  .text-tiny { font-size: 11px; }
-  
+  .text-micro {
+    font-size: 9px;
+  }
+  .text-mini {
+    font-size: 10px;
+  }
+  .text-tiny {
+    font-size: 11px;
+  }
+
   .label-uppercase {
     font-size: 9px;
     font-weight: 700;
@@ -194,35 +213,63 @@
   /* ============================== */
   /* UTILS                          */
   /* ============================== */
-  .no-scrollbar::-webkit-scrollbar { display: none; }
-  .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-  
-  .animate-enter { animation: fadeScale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-  
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .animate-enter {
+    animation: fadeScale 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+
   .gpu-accelerated {
-     will-change: transform, opacity;
-     transform: translateZ(0);
-     backface-visibility: hidden;
+    will-change: transform, opacity;
+    transform: translateZ(0);
+    backface-visibility: hidden;
   }
-  
-  /* Line clamp utilities */
-  .line-clamp-1 { 
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 1;
-    line-clamp: 1;
-    -webkit-box-orient: vertical;
+
+  /* Modal Animations */
+  .animate-lightbox-backdrop {
+    animation: lightboxFadeIn 0.4s ease-out forwards;
   }
-  .line-clamp-2 { 
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    line-clamp: 2;
-    -webkit-box-orient: vertical;
+
+  .animate-lightbox-content {
+    animation: lightboxScaleIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+}
+
+@keyframes lightboxFadeIn {
+  from {
+    opacity: 0;
+    backdrop-filter: blur(0px);
+  }
+  to {
+    opacity: 1;
+    backdrop-filter: blur(24px);
+  }
+}
+
+@keyframes lightboxScaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
   }
 }
 
 @keyframes fadeScale {
-  from { opacity: 0; transform: scale(0.96) translateY(16px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.96) translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }

@@ -95,71 +95,72 @@ export const TRANSLATIONS = {
     // keys: lowercase search terms
     // values: filename in /exercises/ folder (without extension if using helper, but here we specify full path)
     const imageMap = {
-      // Chest
-      "bench": "/exercises/bench-press.png",
-      "press": "/exercises/bench-press.png", 
-      "push-up": "/exercises/push-up.png",
-      "pushup": "/exercises/push-up.png",
-      "şınav": "/exercises/push-up.png",
-      "fly": "/exercises/dumbbell-fly.png",
-      "incline": "/exercises/incline-press.png",
+      // Chest (Exact matches from user's folder)
+      // Note: bench_press file is MISSING, using incline as fallback
+      "bench press": "/exercises/incline_bench_press_guide_1769369743130.jpg",
+      "incline bench": "/exercises/incline_bench_press_guide_1769369743130.jpg",
+      "decline bench": "/exercises/incline_bench_press_guide_1769369743130.jpg", // decline file also missing
+      "dumbbell press": "/exercises/dumbbell_press_guide_1769369771987.jpg",
+      "incline dumbbell press": "/exercises/incline_dumbbell_press_guide_1769369968978.jpg",
       
-      // Back
-      "pull-up": "/exercises/pull-up.png",
-      "pullup": "/exercises/pull-up.png",
-      "barfiks": "/exercises/pull-up.png",
-      "chin-up": "/exercises/pull-up.png",
-      "lat": "/exercises/lat-pulldown.png",
-      "row": "/exercises/barbell-row.png",
-      "kürek": "/exercises/barbell-row.png",
-      "deadlift": "/exercises/deadlift.png",
+      "push-up": "/exercises/push_up_guide_1769369999163.jpg",
+      "pushup": "/exercises/push_up_guide_1769369999163.jpg",
+      "diamond push": "/exercises/diamond_push_up_guide_1769370013507.jpg",
+      "wide push": "/exercises/wide_push_up_guide_1769370028888.jpg",
+      "decline push": "/exercises/decline_push_up_guide_1769370042710.jpg",
+      
+      "dips": "/exercises/dips_chest_guide_1769370057475.jpg", 
+      "dip": "/exercises/dips_chest_guide_1769370057475.jpg",
+
+      "fly": "/exercises/dumbbell_fly_guide_1769370070637.jpg",
+      "cable fly": "/exercises/cable_fly_guide_1769370099387.jpg",
+      "pec deck": "/exercises/pec_deck_guide_1769370113721.jpg",
+      "pullover": "/exercises/pullover_guide_1769370128094.jpg",
+      
+      // Back & Lats
+      "deadlift": "/exercises/deadlift_guide_1769370163713.jpg",
+      "row": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "barfiks": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "pull-up": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
       
       // Shoulders
-      "shoulder": "/exercises/shoulder-press.png",
-      "overhead": "/exercises/shoulder-press.png",
-      "military": "/exercises/shoulder-press.png",
-      "lateral": "/exercises/lateral-raise.png",
-      "front": "/exercises/front-raise.png",
-      "face": "/exercises/face-pull.png",
-      
-      // Arms
-      "bicep": "/exercises/bicep-curl.png",
-      "curl": "/exercises/bicep-curl.png",
-      "hammer": "/exercises/hammer-curl.png",
-      "dip": "/exercises/tricep-dip.png",
-      "tricep": "/exercises/tricep-pushdown.png",
-      "skull": "/exercises/skull-crusher.png",
-      
+      "lateral": "/exercises/dumbbell_press_guide_1769369771987.jpg", // TEMPORARY FALLBACK
+      "shoulder": "/exercises/dumbbell_press_guide_1769369771987.jpg", // TEMPORARY FALLBACK
+      "thruster": "/exercises/dumbbell_press_guide_1769369771987.jpg", // TEMPORARY FALLBACK
+      "overhead": "/exercises/dumbbell_press_guide_1769369771987.jpg", // TEMPORARY FALLBACK
+
       // Legs
-      "squat": "/exercises/squat.png",
-      "leg press": "/exercises/leg-press.png",
-      "lunge": "/exercises/lunge.png",
-      "leg curl": "/exercises/leg-curl.png",
-      "extension": "/exercises/leg-extension.png",
-      "calf": "/exercises/calf-raise.png",
-      "hip": "/exercises/hip-thrust.png",
-      "romanian": "/exercises/rdl.png",
-      
+      "squat": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "lunge": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "glute": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "leg": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "walk": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "koşu": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+
       // Core
-      "plank": "/exercises/plank.png",
-      "crunch": "/exercises/crunch.png",
-      "sit-up": "/exercises/sit-up.png",
-      "leg raise": "/exercises/leg-raise.png",
-      "russian": "/exercises/russian-twist.png",
-      "mountain": "/exercises/mountain-climber.png",
+      "plank": "/exercises/push_up_guide_1769369999163.jpg", // TEMPORARY FALLBACK
+      "mountain": "/exercises/push_up_guide_1769369999163.jpg", // TEMPORARY FALLBACK
+      "dead bug": "/exercises/push_up_guide_1769369999163.jpg", // TEMPORARY FALLBACK
+      "core": "/exercises/push_up_guide_1769369999163.jpg", // TEMPORARY FALLBACK
       
-      // Cardio
-      "run": "/exercises/run.png",
-      "koşu": "/exercises/run.png",
-      "burpee": "/exercises/burpee.png",
-      "jump": "/exercises/jumping-jack.png",
+      // Yoga/Stretch
+      "yoga": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      "stretch": "/exercises/deadlift_guide_1769370163713.jpg", // TEMPORARY FALLBACK
+      
+      // Fallbacks (generic keywords)
+      "bench": "/exercises/incline_bench_press_guide_1769369743130.jpg",
+      "press": "/exercises/incline_bench_press_guide_1769369743130.jpg", 
+      "şınav": "/exercises/push_up_guide_1769369999163.jpg",
+      "incline": "/exercises/incline_bench_press_guide_1769369743130.jpg",
     };
     
     // Find matching image
-    const key = Object.keys(imageMap).find(k => n.includes(k));
+    // Sort keys by length (descending) to match specific names before generic keywords
+    const keys = Object.keys(imageMap).sort((a, b) => b.length - a.length);
+    const key = keys.find(k => n.includes(k));
     
-    // Return mapped image or a default placeholder
-    return imageMap[key] || "/exercises/default.png";
+    // Return mapped image or a default fallback if absolutely nothing matches
+    return imageMap[key] || "/exercises/dumbbell_press_guide_1769369771987.jpg"; // Default to dumbbell press
   };
 
   // --- MUSCLEWIKI TUTORIAL LINKS ---

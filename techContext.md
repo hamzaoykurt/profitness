@@ -17,3 +17,4 @@
 
 - Performance is key (GPU optimized CSS).
 - Aesthetic must remain "Avant-Garde".
+- **Mobile Strategy**: Capacitor (Hybrid Native) to maintain custom UI fidelity across Web/Android/iOS.
