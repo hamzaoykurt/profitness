@@ -137,8 +137,9 @@ Kullanıcının ihtiyacına göre 1-7 gün arası antrenman programı oluştur. 
 2. Eğer program Pazar günü içeriyorsa, Pazar dinlenme günü olsun ve "isRestDay": true ekle, exercises boş array olsun
 
 JSON formatında yanıt ver:
+JSON formatında yanıt ver:
 [
-  {"label":"Pzt","title":"Göğüs","exercises":[{"name":"Bench Press","sets":4,"reps":10,"note":"Dirsekleri 45 derece açıda tut, omuzları geri çek."}]},
+  {"label":"Pzt","title":"Göğüs","exercises":[{"name":"Bench Press","sets":4,"reps":10,"note":"Barı göğsünün ortasına indirirken kontrolü elden bırakma, patlayıcı güçle kaldırırken nefes ver. Dirsek açını 45 derecede tutarak omuzlarını koru."}]},
   {"label":"Paz","title":"Dinlenme","isRestDay":true,"exercises":[]}
 ]
 

@@ -194,6 +194,7 @@ export default function App() {
           lang={lang} 
           profile={profile}
           hasProgram={hasProgram}
+          userId={user?.uid}
           onCreateProgram={async (days) => {
             const result = await saveProgram(days);
             if (result.success) {

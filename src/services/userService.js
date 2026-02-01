@@ -8,6 +8,11 @@ import {
   getDoc, 
   setDoc, 
   updateDoc, 
+  deleteDoc,
+  collection,
+  query,
+  orderBy,
+  getDocs,
   onSnapshot,
   serverTimestamp 
 } from 'firebase/firestore';
@@ -15,6 +20,7 @@ import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { db, storage } from './firebase';
 
 const USERS_COLLECTION = 'users';
+const CHATS_COLLECTION = 'chats';
 const XP_PER_SET = 25;
 const XP_PER_LEVEL = 1000;
 
@@ -372,3 +378,150 @@ export const useCredit = async (uid) => {
     return { success: false, error: error.message };
   }
 };
+
+/**
+ * Save chat history to a specific session
+ * @param {string} uid 
+ * @param {string} sessionId
+ * @param {Array} messages 
+ * @returns {Promise<{success: boolean}>}
+ */
+export const saveChatSession = async (uid, sessionId, messages) => {
+  if (!uid || !sessionId) return { success: false };
+  try {
+    const sessionRef = doc(db, CHATS_COLLECTION, uid, 'sessions', sessionId);
+    const trimmedMessages = messages.slice(-50);
+    await setDoc(sessionRef, {
+      messages: trimmedMessages,
+      updatedAt: serverTimestamp()
+    }, { merge: true });
+    return { success: true };
+  } catch (error) {
+    console.error('saveChatSession error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Get all chat sessions for a user
+ * @param {string} uid 
+ * @returns {Promise<Array<{id: string, messages: Array, updatedAt: any}>>}
+ */
+export const getChatSessions = async (uid) => {
+  if (!uid) return [];
+  try {
+    const sessionsRef = collection(db, CHATS_COLLECTION, uid, 'sessions');
+    const q = query(sessionsRef, orderBy('updatedAt', 'desc'));
+    const snapshot = await getDocs(q);
+    
+    let sessions = snapshot.docs.map(doc => ({
+      id: doc.id,
+      ...doc.data()
+    }));
+
+    // Migration Check: If no sessions, check for legacy data
+    if (sessions.length === 0) {
+       const legacyChatRef = doc(db, CHATS_COLLECTION, uid);
+       const legacySnap = await getDoc(legacyChatRef);
+       
+       if (legacySnap.exists()) {
+          const legacyData = legacySnap.data();
+          if (legacyData.messages && legacyData.messages.length > 0) {
+            // Create a migrated session
+            const newId = 'legacy_' + Date.now();
+            // Use legacy timestamp or current time
+            const timestamp = legacyData.updatedAt || serverTimestamp();
+            
+            const sessionRef = doc(db, CHATS_COLLECTION, uid, 'sessions', newId);
+            await setDoc(sessionRef, {
+              messages: legacyData.messages,
+              updatedAt: timestamp,
+              migrated: true
+            });
+            
+            sessions = [{ 
+              id: newId, 
+              messages: legacyData.messages, 
+              updatedAt: timestamp 
+            }];
+
+            // Optional: Delete legacy doc to prevent double migration? 
+            // Better to keep it for safety, but maybe mark it? 
+            // For now, next time sessions.length won't be 0 so it won't run again.
+          }
+       }
+    }
+    
+    return sessions;
+  } catch (error) {
+    console.error('getChatSessions error:', error);
+    return [];
+  }
+};
+
+/**
+ * Get messages from a specific chat session
+ * @param {string} uid 
+ * @param {string} sessionId 
+ * @returns {Promise<Array>}
+ */
+export const getChatSessionMessages = async (uid, sessionId) => {
+  if (!uid || !sessionId) return [];
+  try {
+    const sessionRef = doc(db, CHATS_COLLECTION, uid, 'sessions', sessionId);
+    const snapshot = await getDoc(sessionRef);
+    if (snapshot.exists()) {
+      return snapshot.data().messages || [];
+    }
+    return [];
+  } catch (error) {
+    console.error('getChatSessionMessages error:', error);
+    return [];
+  }
+};
+
+/**
+ * Create a new chat session
+ * @param {string} uid 
+ * @param {string} initialGreeting 
+ * @returns {Promise<{success: boolean, sessionId?: string}>}
+ */
+export const createChatSession = async (uid, initialGreeting) => {
+  if (!uid) return { success: false };
+  try {
+    const sessionsRef = collection(db, CHATS_COLLECTION, uid, 'sessions');
+    const newSessionRef = doc(sessionsRef);
+    await setDoc(newSessionRef, {
+      messages: [{ role: 'assistant', text: initialGreeting }],
+      createdAt: serverTimestamp(),
+      updatedAt: serverTimestamp()
+    });
+    return { success: true, sessionId: newSessionRef.id };
+  } catch (error) {
+    console.error('createChatSession error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+/**
+ * Delete a chat session
+ * @param {string} uid 
+ * @param {string} sessionId 
+ * @returns {Promise<{success: boolean}>}
+ */
+export const deleteChatSession = async (uid, sessionId) => {
+  if (!uid || !sessionId) return { success: false };
+  try {
+    const sessionRef = doc(db, CHATS_COLLECTION, uid, 'sessions', sessionId);
+    await deleteDoc(sessionRef);
+    return { success: true };
+  } catch (error) {
+    console.error('deleteChatSession error:', error);
+    return { success: false, error: error.message };
+  }
+};
+
+// Legacy functions for backwards compatibility (single-session)
+export const saveChatHistory = async (uid, messages) => saveChatSession(uid, 'default', messages);
+export const getChatHistory = async (uid) => getChatSessionMessages(uid, 'default');
+export const clearChatHistory = async (uid) => deleteChatSession(uid, 'default');

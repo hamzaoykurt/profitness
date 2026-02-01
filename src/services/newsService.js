@@ -156,6 +156,8 @@ const fetchRSSFeed = async (feedUrl) => {
   }
 };
 
+import { translateText, summarizeNews } from './geminiService';
+
 /**
  * Fetch news from multiple RSS feeds by category
  */
@@ -170,8 +172,8 @@ export const fetchNews = async (category = 'all', lang = 'tr') => {
       feeds = RSS_FEEDS[category] || RSS_FEEDS.fitness;
     }
     
-    // Fetch from all selected feeds (limit to 6 for speed)
-    const selectedFeeds = feeds.slice(0, 6);
+    // Fetch from all selected feeds (limit to 3 for speed when translating)
+    const selectedFeeds = feeds.slice(0, 3);
     const allResults = await Promise.all(
       selectedFeeds.map(feed => fetchRSSFeed(feed))
     );
@@ -187,29 +189,43 @@ export const fetchNews = async (category = 'all', lang = 'tr') => {
       seen.add(key);
       return true;
     });
-    
+
     // If RSS failed or returned too few, use fallback
-    if (news.length < 5) {
-      console.log('RSS feeds insufficient, adding fallback news');
+    if (news.length < 3) {
       let fallback = FALLBACK_NEWS[lang] || FALLBACK_NEWS.tr;
-      
       if (category !== 'all') {
         fallback = fallback.filter(n => n.category === category);
       }
-      
       news = [...news, ...fallback];
-    }
-    
-    // Filter by category if not 'all' and RSS didn't do it
-    if (category !== 'all') {
-      news = news.filter(n => n.category === category);
     }
     
     // Sort by date (newest first)
     news.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
     
-    // Limit to 20 items
-    return news.slice(0, 20);
+    // Take top 12
+    let finalNews = news.slice(0, 12);
+
+    // AI Translation & Summarization (Only if TR and not already fallback)
+    if (lang === 'tr') {
+      finalNews = await Promise.all(finalNews.map(async (item) => {
+        // Skip if it looks like Turkish already (fallback items)
+        const isTurkish = /[çğıöşü]/i.test(item.title);
+        if (isTurkish) return item;
+
+        // Translate Title
+        const transResult = await translateText(item.title, 'tr');
+        // Generate AI Analysis
+        const summaryResult = await summarizeNews(item.desc, 'tr');
+
+        return {
+          ...item,
+          title: transResult.success ? transResult.translation : item.title,
+          aiSummary: summaryResult.success ? summaryResult.summary : item.aiSummary
+        };
+      }));
+    }
+    
+    return finalNews;
   } catch (error) {
     console.error('fetchNews error:', error);
     return FALLBACK_NEWS[lang] || FALLBACK_NEWS.tr;

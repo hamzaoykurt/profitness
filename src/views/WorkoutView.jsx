@@ -98,6 +98,12 @@ const WorkoutView = ({
     </div>
   );
 
+  // Helper to clean markdown from titles (e.g., "**Bacak** ve **Omuz**" -> "Bacak ve Omuz")
+  const stripMarkdown = (text) => {
+    if (!text) return '';
+    return text.replace(/\*\*/g, '').replace(/\*/g, '').trim();
+  };
+
   return (
     <>
       {/* Confirm Modal */}
@@ -126,7 +132,7 @@ const WorkoutView = ({
         <div className="px-2 mb-6 flex justify-between items-end">
           <div>
             <h2 className="text-[10px] font-bold text-gray-400 uppercase tracking-[0.2em] mb-1">PRO VISION</h2>
-            <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{currentDay.title || currentDay.label}</h1>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white tracking-tight">{stripMarkdown(currentDay.title) || currentDay.label}</h1>
           </div>
           <div className="flex items-center gap-2">
             <div className="text-right">
