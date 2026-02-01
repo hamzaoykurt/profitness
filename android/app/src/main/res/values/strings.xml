@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Profitness</string>
+    <string name="title_activity_main">Profitness</string>
+    <string name="package_name">com.profitness.app</string>
+    <string name="custom_url_scheme">com.profitness.app</string>
+</resources>
